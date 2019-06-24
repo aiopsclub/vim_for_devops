@@ -1,21 +1,37 @@
 set nocompatible              " be iMproved, required
 filetype off                   " required!
-
+autocmd BufWritePre *.py execute ':Black'
 set rtp+=~/.vim/bundle/Vundle.vim
 call vundle#begin()
 
 " let Vundle manage Vundle
 " required! 
 Plugin 'altercation/vim-colors-solarized'
+Plugin 'terryma/vim-multiple-cursors'
 Plugin 'gmarik/Vundle.vim'
 Plugin 'Valloric/YouCompleteMe'
+Plugin 'fisadev/vim-isort'
+let g:vim_isort_python_version = 'python3'
+Plugin 'kien/ctrlp.vim'
+Plugin 'python-mode/python-mode', { 'branch': 'develop'  }
+let g:pymode = 1
+let g:pymode_python = 'python3'
+let g:pymode_options_max_line_length = 150 
 Plugin 'skywind3000/asyncrun.vim'
+Plugin 'ambv/black'
 Plugin 'jiangmiao/auto-pairs'
 Plugin 'itchyny/lightline.vim'
 Plugin 'tell-k/vim-autopep8'
+Plugin 'ruanyl/vim-fixmyjs'
 " jsx
 Plugin 'mxw/vim-jsx'
 let g:jsx_ext_required = 0 " Allow JSX in normal JS files
+let g:multi_cursor_use_default_mapping=0
+" Default mapping
+let g:multi_cursor_next_key='<C-m>'
+let g:multi_cursor_prev_key='<C-p>'
+let g:multi_cursor_skip_key='<C-x>'
+let g:multi_cursor_quit_key='<Esc>'
 
 " My Bundles here:
 "
@@ -63,15 +79,13 @@ Plugin 'fatih/vim-go'
 "F7检查语法
 Plugin 'vim-flake8'
 
-"python补全
-Plugin 'davidhalter/jedi-vim'
-
-
 " 使用vim-syntastic需要flake8
 Plugin 'scrooloose/syntastic'
 "在打开文件的时候检查
 let g:syntastic_check_on_open=1
-let g:syntastic_python_flake8_post_args='--ignore=E501'
+let g:syntastic_python_flake8_post_args='--ignore=E501,F403'
+let g:syntastic_python_flake8_exec = 'python3'
+let g:syntastic_python_flake8_args = ['-m', 'flake8']
 
 " non github repos
 "Bundle 'git://git.wincent.com/command-t.git'
@@ -101,7 +115,6 @@ filetype plugin indent on     " required!
 "
 " see :h vundle for more details or wiki for FAQ
 " NOTE: comments after Bundle command are not allowed..
-
 "开启语法高亮
 syntax on
 "窗口大小
@@ -289,6 +302,7 @@ nnoremap gb `[v`]
 map <F3>  :copen<CR> 
 map <F4>  :cclose<CR> 
 set laststatus=2
+map <F9> :Fixmyjs<CR>
 
 
 
