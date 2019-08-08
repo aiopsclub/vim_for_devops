@@ -11,6 +11,7 @@ Plugin 'terryma/vim-multiple-cursors'
 Plugin 'gmarik/Vundle.vim'
 Plugin 'Valloric/YouCompleteMe'
 Plugin 'fisadev/vim-isort'
+Plugin 'WolfgangMehner/bash-support'
 let g:vim_isort_python_version = 'python3'
 Plugin 'kien/ctrlp.vim'
 Plugin 'python-mode/python-mode', { 'branch': 'develop'  }
