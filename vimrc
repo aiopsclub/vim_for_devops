@@ -7,11 +7,11 @@ call vundle#begin()
 " let Vundle manage Vundle
 " required! 
 Plugin 'altercation/vim-colors-solarized'
+Plugin 'WolfgangMehner/bash-support'
 Plugin 'terryma/vim-multiple-cursors'
 Plugin 'gmarik/Vundle.vim'
 Plugin 'Valloric/YouCompleteMe'
 Plugin 'fisadev/vim-isort'
-Plugin 'WolfgangMehner/bash-support'
 let g:vim_isort_python_version = 'python3'
 Plugin 'kien/ctrlp.vim'
 Plugin 'python-mode/python-mode', { 'branch': 'develop'  }
@@ -24,6 +24,7 @@ Plugin 'jiangmiao/auto-pairs'
 Plugin 'itchyny/lightline.vim'
 Plugin 'tell-k/vim-autopep8'
 Plugin 'ruanyl/vim-fixmyjs'
+Plugin 'mhinz/vim-startify'
 " jsx
 Plugin 'mxw/vim-jsx'
 let g:jsx_ext_required = 0 " Allow JSX in normal JS files
@@ -77,6 +78,10 @@ let g:NERDTreeWinSize=28
 "Bundle 'wting/rust.vim'
 "golang
 Plugin 'fatih/vim-go'
+let g:go_fmt_command = "goimports"
+let g:go_highlight_types = 1
+let g:go_highlight_functions = 1
+let g:go_highlight_function_calls = 1
 "F7检查语法
 Plugin 'vim-flake8'
 
@@ -84,7 +89,7 @@ Plugin 'vim-flake8'
 Plugin 'scrooloose/syntastic'
 "在打开文件的时候检查
 let g:syntastic_check_on_open=1
-let g:syntastic_python_flake8_post_args='--ignore=E501,F403'
+let g:syntastic_python_flake8_post_args='--ignore=E501,F403,W503'
 let g:syntastic_python_flake8_exec = 'python3'
 let g:syntastic_python_flake8_args = ['-m', 'flake8']
 
@@ -274,7 +279,8 @@ inoremap <C-Z> <C-O>u
 " CTRL-Y is Redo (although not repeat); not in cmdline though
 noremap <C-Y> <C-R>
 inoremap <C-Y> <C-O><C-R>
-let g:ycm_global_ycm_extra_conf='~/.vim/bundle/YouCompleteMe/third_party/ycmd/cpp/ycm/.ycm_extra_conf.py'  "设置全局配置文件的路径
+" 安装ycm时可自行git clone
+let g:ycm_global_ycm_extra_conf='~/.vim/bundle/YouCompleteMe/.ycm_extra_conf.py'  "设置全局配置文件的路径
 let g:ycm_seed_identifiers_with_syntax=1    " 语法关键字补全
 let g:ycm_confirm_extra_conf=0  " 打开vim时不再询问是否加载ycm_extra_conf.py配置
 let g:ycm_key_invoke_completion = '<C-a>' " ctrl + a 触发补全
