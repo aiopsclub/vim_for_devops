@@ -24,9 +24,14 @@ set -e
 BASE_VIM_VERSION=8
 GO_MAJGOR_VERSION=1
 GO_MINOR_VERSION=11
+SOFTWARE_PATH_BASE=/usr/local/
+SOFTWARE_SRC=/opt/src
 
 YCM_GITHUB=https://github.com/ycm-core/YouCompleteMe
 PY3_SOURCE=https://www.python.org/ftp/python/3.7.4/Python-3.7.4.tgz
+
+PY3_SOURCE_MD5=68111671e5b2db4aef7b9ab01bf0f9be
+
 GO_BINARY=https://dl.google.com/go/go1.13.linux-amd64.tar.gz
 
 
@@ -34,11 +39,54 @@ function logging () {
     echo "$(date '+%F %H:%M:%S')    |  $*"
 }
 
+function ensure_dir_exist(){
+    dir=$1
+    if [ ! -d "$dir" ];then
+        mkdir -p $dir 
+    fi
+}
+
+function check_file_md5(){
+    filepath=$1
+    value=$2
+    md5value=`md5sum $filepath|awk '{print $1}'`
+
+    if [ $value == $md5value ]
+    then
+        echo "true"
+    else
+        echo "false"
+    fi
+}
+
 function install_base_sortware(){
-    yum install bc -y
-    yum install git -y
+    yum install bc git cmake -y
     yum groupinstall "Development Tools" -y
 }
+
+function dir_is_empty(){
+    empty_dir=$1
+    file_num=`ls -l $empty_dir |grep -v "^total"|wc -l`
+    if [ $file_num -gt 0 ]
+    then
+        echo "false"
+    else
+        echo "true"
+    fi
+}
+
+function check_dir_exist(){
+    check_dir=$1
+    if [ -d "$check_dir" ]
+    then
+        echo "true"
+    else
+        echo "false"
+    fi
+}
+
+
+
 
 function go_depend_source() {
    
@@ -50,6 +98,8 @@ function go_depend_source() {
     go install golang.org/x/lint
     go install golang.org/x/tools/...
 }
+
+
 
 function check_go_version(){
     go_version=`go version | sed -rn "s@.*go([0-9]+\.[0-9]*\.?[0-9]*) .*@\1@p"`
@@ -92,7 +142,39 @@ function check_vim_version(){
     fi
 }
 
+function main(){
+    py37_is_install=`check_dir_exist ${SOFTWARE_PATH_BASE}python3.7`
+    if $py37_is_install
+    then
+        py37_is_empty=`dir_is_empty ${SOFTWARE_PATH_BASE}python3.7`
+        if ! $py37_is_empty
+        then
+            logging "${SOFTWARE_PATH_BASE}python3.7 not empty!"
+            exit 1
+        fi
+    fi
 
-check_vim_version
-check_go_version
+    vim81_is_install=`check_dir_exist ${SOFTWARE_PATH_BASE}vim81`
+    if $vim81_is_install
+    then
+        vim81_is_empty=`dir_is_empty ${SOFTWARE_PATH_BASE}vim81`
+        if ! $py37_is_empty
+        then
+            logging "${SOFTWARE_PATH_BASE}vim81 not empty!"
+            exit 2
+        fi
+    fi
 
+    go111_is_install=`check_dir_exist ${SOFTWARE_PATH_BASE}go1.11`
+    if $go111_is_install
+    then
+        go111_is_empty=`dir_is_empty ${SOFTWARE_PATH_BASE}go1.11`
+        if ! $go111_is_empty
+        then
+            logging "${SOFTWARE_PATH_BASE}go1.11 not empty!"
+            exit 3
+        fi
+    fi
+}
+
+main
