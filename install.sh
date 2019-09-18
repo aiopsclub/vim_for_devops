@@ -28,8 +28,8 @@ SOFTWARE_PATH_BASE=/usr/local/
 SOFTWARE_SRC=/opt/src/
 
 YCM_GITHUB=https://github.com/ycm-core/YouCompleteMe
-PY3_SOURCE=https://www.python.org/ftp/python/3.7.4/Python-3.7.4.tgz
 
+PY3_SOURCE=https://www.python.org/ftp/python/3.7.4/Python-3.7.4.tgz
 PY3_SOURCE_MD5=68111671e5b2db4aef7b9ab01bf0f9be
 
 GO_BINARY=https://dl.google.com/go/go1.13.linux-amd64.tar.gz
@@ -62,7 +62,7 @@ function check_file_md5(){
 
 function install_base_software(){
     logging "Start install base software"
-    yum install bc git cmake openssl libffi-devel -y
+    yum install bc git cmake openssl libffi-devel python-devel ruby-devel lua-devel perl-devel perl ruby lua -y
     yum groupinstall "Development Tools" -y
 }
 
@@ -145,6 +145,7 @@ function check_vim_version(){
 }
 
 function build_py3(){
+    old_dir = `pwd`
     if `check_dir_exist ${SOFTWARE_SRC}Python-3.7.4`
     then
         rm -fr ${SOFTWARE_SRC}Python-3.7.4
@@ -157,11 +158,27 @@ function build_py3(){
     make && make install
     echo -n "${SOFTWARE_PATH_BASE}python3.7/lib" >> /etc/ld.so.conf.d/python3.conf
     ldconfig -v
+    cd $old_dir	
 }
 
 function build_go(){
-    tar xf ${SOFTWARE_SRC}go1.13.linux-amd64.tar.gz -C ${SOFTWARE_SRC}
-    mv ${SOFTWARE_SRC}go ${SOFTWARE_SRC}go1.13
+    # 创建临时目录
+    tmp_dir=`mktemp -d`
+    tar xf ${SOFTWARE_SRC}go1.13.linux-amd64.tar.gz -C ${tmp_dir}
+    mv ${tmp_dir}go ${SOFTWARE_SRC}go1.13
+    rm -fr ${tmp_dir}
+}
+
+function build_vim(){
+    old=`pwd`
+    cd ${SOFTWARE_SRC}vim/src
+    ./configure --with-features=huge --enable-multibyte --enable-rubyinterp=yes --enable-pythoninterp=yes --with-python-config-dir=/usr/lib64/python2.7/config --enable-python3interp=yes --with-python3-config-dir=${SOFTWARE_PATH_BASE}python3.7/lib/python3.7/config-3.7m-x86_64-linux-gnu --enable-perlinterp=yes --enable-luainterp=yes --enable-cscope --prefix=${SOFTWARE_PATH_BASE}vim8   --enable-terminal --enable-multibyte
+    make && make install
+    cd $old_dir
+}
+
+function install_vim(){
+    git clone https://github.com/vim/vim.git ${SOFTWARE_SRC}
 }
 
 
@@ -221,6 +238,7 @@ function check_soft_is_install(){
         if ! `dir_is_empty ${SOFTWARE_PATH_BASE}${soft_name}`
          
         then
+            echo ""
             logging "${SOFTWARE_PATH_BASE}${soft_name} not empty!"
             exit 3
         fi
@@ -228,10 +246,25 @@ function check_soft_is_install(){
 
 }
 
+function set_gopath(){
+    gopath=/opt/src/go
+    read -p "Set env GOPATH[/opt/src/go]: " go_path 
+    if [[ "$go_path" =~ ^/[a-zA-Z0-9]+(/[a-zA-Z0-9]+)*  ]]
+    then
+        export GOPATH=$go_path
+    else
+        export GOPATH=$gopath
+    fi
+    logging "set GOPATH $GOPATH"
+}
+
 function main(){
     ensure_dir_exist ${SOFTWARE_SRC}
     install_base_software
+    set_gopath
+    ensure_dir_exist $GOPATH
     
+    logging "Install python3..."
     if `install_choice python3` 
     then
         check_soft_is_install python3.7 
@@ -239,22 +272,21 @@ function main(){
     fi
     echo ""
     
+    logging "Install vim..."
     if `install_choice vim81` 
     then
         check_soft_is_install vim81 
+        install_vim
     fi
     echo ""
 
+    logging "Install golang..."
     if `install_choice go1.13` 
     then
        check_soft_is_install go1.13 
        install_go
     fi
     echo ""
-
-
-
-    
 }
 
 # 入口函数
