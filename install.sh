@@ -118,7 +118,10 @@ function check_go_version(){
 
 function copy_vimrc_to_home(){
     # 备份源文件
-    cp -a ~/.vimrc ~/.vimrc.bak
+    if [ -e ~/.vimrc ]
+    then
+        cp -a ~/.vimrc ~/.vimrc.bak
+    fi
     cp -af ./vimrc ~/.vimrc 
 }
 
@@ -285,6 +288,7 @@ function main(){
     then
        check_soft_is_install go1.13 
        install_go
+       go_depend_source
     fi
     echo ""
 }
