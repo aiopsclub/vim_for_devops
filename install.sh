@@ -25,7 +25,7 @@ BASE_VIM_VERSION=8
 GO_MAJGOR_VERSION=1
 GO_MINOR_VERSION=11
 SOFTWARE_PATH_BASE=/usr/local/
-SOFTWARE_SRC=/opt/src
+SOFTWARE_SRC=/opt/src/
 
 YCM_GITHUB=https://github.com/ycm-core/YouCompleteMe
 PY3_SOURCE=https://www.python.org/ftp/python/3.7.4/Python-3.7.4.tgz
@@ -33,6 +33,7 @@ PY3_SOURCE=https://www.python.org/ftp/python/3.7.4/Python-3.7.4.tgz
 PY3_SOURCE_MD5=68111671e5b2db4aef7b9ab01bf0f9be
 
 GO_BINARY=https://dl.google.com/go/go1.13.linux-amd64.tar.gz
+GO_SOURCE_MD5=f88286704f2b5aaff8041cb269745427
 
 
 function logging () { 
@@ -60,7 +61,7 @@ function check_file_md5(){
 }
 
 function install_base_sortware(){
-    yum install bc git cmake -y
+    yum install bc git cmake openssl -y
     yum groupinstall "Development Tools" -y
 }
 
@@ -142,39 +143,88 @@ function check_vim_version(){
     fi
 }
 
-function main(){
-    py37_is_install=`check_dir_exist ${SOFTWARE_PATH_BASE}python3.7`
-    if $py37_is_install
+function build_py3(){
+    if `check_dir_exist ${SOFTWARE_SRC}Python-3.7.4`
     then
-        py37_is_empty=`dir_is_empty ${SOFTWARE_PATH_BASE}python3.7`
-        if ! $py37_is_empty
+        rm -fr ${SOFTWARE_SRC}Python-3.7.4
+    fi
+    tar xf ${SOFTWARE_SRC}Python-3.7.4.tgz -C ${SOFTWARE_SRC}
+    worddir=`pwd`
+    cp -f ${worddir}/Setup.dist ${SOFTWARE_SRC}Python-3.7.4/Modules/
+    cd ${SOFTWARE_SRC}Python-3.7.4
+    ./configure --prefix=${SOFTWARE_PATH_BASE}python3.7 --enable-shared  --enable-optimizations --enable-ipv6
+    make && make install
+    echo -n "${SOFTWARE_PATH_BASE}python3.7/lib" >> /etc/ld.so.conf.d/python3.conf
+    ldconfig -v
+}
+
+function build_go(){
+    tar xf ${SOFTWARE_SRC}go1.13.linux-amd64.tar.gz -C ${SOFTWARE_SRC}
+    mv ${SOFTWARE_SRC}go ${SOFTWARE_SRC}go1.13
+}
+
+
+function install_py3(){
+    if [ -e ${SOFTWARE_SRC}Python-3.7.4.tgz ]
+    then
+        if ! `check_file_md5 ${SOFTWARE_SRC}Python-3.7.4.tgz PY3_SOURCE_MD5`
+        then
+            rm -f ${SOFTWARE_SRC}Python-3.7.4.tgz
+            wget $PY3_SOURCE
+        else
+            build_py3
+        fi
+    else
+        wget $PY3_SOURCE
+        build_py3
+    fi
+}
+
+function install_py3(){
+    if [ -e ${SOFTWARE_SRC}go1.13.linux-amd64.tar.gz ]
+    then
+        if ! `check_file_md5 ${SOFTWARE_SRC}go1.13.linux-amd64.tar.gz GO_SOURCE_MD5`
+        then
+            rm -f ${SOFTWARE_SRC}go1.13.linux-amd64.tar.gz
+            wget $GO_BINARY
+        else
+            build_go
+        fi
+    else
+        wget $GO_BINARY
+        build_go
+    fi
+}
+
+function main(){
+    if `check_dir_exist ${SOFTWARE_PATH_BASE}python3.7`
+    then
+        if ! `dir_is_empty ${SOFTWARE_PATH_BASE}python3.7`
+         
         then
             logging "${SOFTWARE_PATH_BASE}python3.7 not empty!"
             exit 1
         fi
     fi
 
-    vim81_is_install=`check_dir_exist ${SOFTWARE_PATH_BASE}vim81`
-    if $vim81_is_install
+    if `check_dir_exist ${SOFTWARE_PATH_BASE}vim81`
     then
-        vim81_is_empty=`dir_is_empty ${SOFTWARE_PATH_BASE}vim81`
-        if ! $py37_is_empty
+        if ! `dir_is_empty ${SOFTWARE_PATH_BASE}vim81`
         then
             logging "${SOFTWARE_PATH_BASE}vim81 not empty!"
             exit 2
         fi
     fi
 
-    go111_is_install=`check_dir_exist ${SOFTWARE_PATH_BASE}go1.11`
-    if $go111_is_install
+    if `check_dir_exist ${SOFTWARE_PATH_BASE}go1.13`
     then
-        go111_is_empty=`dir_is_empty ${SOFTWARE_PATH_BASE}go1.11`
-        if ! $go111_is_empty
+        if ! `dir_is_empty ${SOFTWARE_PATH_BASE}go1.13`
         then
-            logging "${SOFTWARE_PATH_BASE}go1.11 not empty!"
+            logging "${SOFTWARE_PATH_BASE}go1.13 not empty!"
             exit 3
         fi
     fi
 }
 
+# 入口函数
 main
