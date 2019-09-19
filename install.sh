@@ -398,20 +398,25 @@ function usage(){
 
 }
 
+function remove_software(){
+   spath=$1
+   logging "remove $spath"
+   if [ -d $spath ]
+   then
+       rm -fr $spath
+   fi
+
+}
+
 function clean_me() {
-    logging "remove python3..."
-    rm -ri ${SOFTWARE_PATH_BASE}python3.7  || true
-    logging "remove go1.13..."
-    rm -ri ${SOFTWARE_PATH_BASE}go1.13  || true
-    logging "remove vim8..."
-    rm -ri ${SOFTWARE_PATH_BASE}vim8 || true
+    remove_software ${SOFTWARE_PATH_BASE}python3.7
+    remove_software  ${SOFTWARE_PATH_BASE}go1.13
+    remove_software ${SOFTWARE_PATH_BASE}vim8
     if [ -n $GOPATH ]
     then
-       logging "remove $GOPATH"
-       rm -ri $GOPATH  || true
+       remove_software $GOPATH
     fi
-    logging "remove $SOFTWARE_SRC"
-    rm -ri $SOFTWARE_SRC || true
+    remove_software $SOFTWARE_SRC
 }
 
 # 入口函数
