@@ -180,7 +180,7 @@ function install_py3(){
     fi
 }
 
-function install_py3(){
+function install_go(){
     if [ -e ${SOFTWARE_SRC}go1.13.linux-amd64.tar.gz ]
     then
         if ! `check_file_md5 ${SOFTWARE_SRC}go1.13.linux-amd64.tar.gz GO_SOURCE_MD5`
