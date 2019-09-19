@@ -412,7 +412,7 @@ function clean_me() {
     remove_software ${SOFTWARE_PATH_BASE}python3.7
     remove_software  ${SOFTWARE_PATH_BASE}go1.13
     remove_software ${SOFTWARE_PATH_BASE}vim8
-    if [ -n $GOPATH ]
+    if ! [ -z $GOPATH ]
     then
        remove_software $GOPATH
     fi
