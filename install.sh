@@ -62,7 +62,7 @@ function check_file_md5(){
 
 function install_base_software(){
     logging "Start install base software"
-    yum install bc git cmake openssl libffi-devel python-devel ruby-devel lua-devel perl-devel perl ruby lua -y
+    yum install bc ncurses-devel wget git cmake openssl perl* libffi-devel python-devel ruby-devel lua-devel perl-devel perl ruby lua -y
     yum groupinstall "Development Tools" -y
 }
 
@@ -148,7 +148,7 @@ function check_vim_version(){
 }
 
 function build_py3(){
-    old_dir = `pwd`
+    old_dir=`pwd`
     if `check_dir_exist ${SOFTWARE_SRC}Python-3.7.4`
     then
         rm -fr ${SOFTWARE_SRC}Python-3.7.4
@@ -173,15 +173,21 @@ function build_go(){
 }
 
 function build_vim(){
-    old=`pwd`
+    old_dir=`pwd`
     cd ${SOFTWARE_SRC}vim/src
     ./configure --with-features=huge --enable-multibyte --enable-rubyinterp=yes --enable-pythoninterp=yes --with-python-config-dir=/usr/lib64/python2.7/config --enable-python3interp=yes --with-python3-config-dir=${SOFTWARE_PATH_BASE}python3.7/lib/python3.7/config-3.7m-x86_64-linux-gnu --enable-perlinterp=yes --enable-luainterp=yes --enable-cscope --prefix=${SOFTWARE_PATH_BASE}vim8   --enable-terminal --enable-multibyte
-    make && make install
+    make && make install || exit 6 
     cd $old_dir
 }
 
 function install_vim(){
-    git clone https://github.com/vim/vim.git ${SOFTWARE_SRC}
+    if [ -d ${SOFTWARE_SRC}vim ]
+    then
+        rm -fr ${SOFTWARE_SRC}vim
+    fi
+    ensure_dir_exist ${SOFTWARE_SRC}vim 
+    git clone https://github.com/vim/vim.git ${SOFTWARE_SRC}vim
+    build_vim
 }
 
 
@@ -220,15 +226,14 @@ function install_go(){
 
 function install_choice() {
     choice_soft_name=$1
-    read -n1 -p "Do you want to install ${choice_soft_name} [Y/N]? " answer 
+    read -n1 -p "Do you want to install ${choice_soft_name} default:Y [Y/N]? " answer 
     case $answer in 
     Y|y) 
         echo "true";; 
     N|n) 
         echo "false";; 
     *) 
-        echo "error choice"
-        exit 9 
+        echo "true" 
         ;; 
     esac
 }
