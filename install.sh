@@ -60,7 +60,8 @@ function check_file_md5(){
     fi
 }
 
-function install_base_sortware(){
+function install_base_software(){
+    logging "Start install base software"
     yum install bc git cmake openssl libffi-devel -y
     yum groupinstall "Development Tools" -y
 }
@@ -206,25 +207,7 @@ function check_soft_is_install(){
          
         then
             logging "${SOFTWARE_PATH_BASE}${soft_name} not empty!"
-            read -n1 -p "Do you want to skip install ${soft_name} [Y/N]? " answer 
-            case $answer in 
-            Y|y) 
-                echo ""
-                logging "skip install ${soft_name}" 
-                python_mode="false"
-                ;;
-            N|n) 
-                echo ""
-                logging "ok,good bye"
-
-                logging "Please remove ${SOFTWARE_PATH_BASE}${soft_name}"
-                exit 1
-                ;; 
-            *) 
-                echo "error choice" 
-                exit 2
-                ;;
-            esac
+            exit 3
         fi
     fi
 
@@ -232,15 +215,16 @@ function check_soft_is_install(){
 
 function main(){
     ensure_dir_exist ${SOFTWARE_SRC}
-    install_base_sortware
+    install_base_software
     
     
     check_soft_is_install python3.7 
     check_soft_is_install vim81 
     check_soft_is_install go1.13 
-    echo $python_mode
 
-    # install_py3
+    install_py3
+    install_go
+    
 }
 
 # 入口函数
