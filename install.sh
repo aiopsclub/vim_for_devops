@@ -152,7 +152,7 @@ function install_ycm_plugin(){
     fi
     cd  ~/.vim/bundle/YouCompleteMe
     git submodule update --init --recursive
-    ./install.py --clang-completer  --go-completer
+    python3 ./install.py --clang-completer  --go-completer
     cd $ycm_old_dir
 }
 
@@ -360,9 +360,9 @@ function install_me(){
     echo ""
     
     logging "Install vim..."
-    if `install_choice vim81` 
+    if `install_choice vim8` 
     then
-        check_soft_is_install vim81 
+        check_soft_is_install vim8
         install_vim
         source /etc/profile
     fi
