@@ -198,6 +198,21 @@ function install_go(){
     fi
 }
 
+function install_choice() {
+    choice_soft_name=$1
+    read -n1 -p "Do you want to install ${choice_soft_name} [Y/N]? " answer 
+    case $answer in 
+    Y|y) 
+        echo "true";; 
+    N|n) 
+        echo "false";; 
+    *) 
+        echo "error choice"
+        exit 9 
+        ;; 
+    esac
+}
+
 function check_soft_is_install(){
 
     soft_name=$1
@@ -217,13 +232,28 @@ function main(){
     ensure_dir_exist ${SOFTWARE_SRC}
     install_base_software
     
+    if `install_choice python3` 
+    then
+        check_soft_is_install python3.7 
+        install_py3
+    fi
+    echo ""
     
-    check_soft_is_install python3.7 
-    check_soft_is_install vim81 
-    check_soft_is_install go1.13 
+    if `install_choice vim81` 
+    then
+        check_soft_is_install vim81 
+    fi
+    echo ""
 
-    install_py3
-    install_go
+    if `install_choice go1.13` 
+    then
+       check_soft_is_install go1.13 
+       install_go
+    fi
+    echo ""
+
+
+
     
 }
 
