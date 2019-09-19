@@ -400,18 +400,18 @@ function usage(){
 
 function clean_me() {
     logging "remove python3..."
-    rm -ri ${SOFTWARE_PATH_BASE}python3.7 2> /dev/null || true
+    rm -ri ${SOFTWARE_PATH_BASE}python3.7  || true
     logging "remove go1.13..."
-    rm -ri ${SOFTWARE_PATH_BASE}go1.13 2> /dev/null || true
+    rm -ri ${SOFTWARE_PATH_BASE}go1.13  || true
     logging "remove vim8..."
-    rm -ri ${SOFTWARE_PATH_BASE}vim8 2> /dev/null || true
+    rm -ri ${SOFTWARE_PATH_BASE}vim8 || true
     if [ -n $GOPATH ]
     then
        logging "remove $GOPATH"
-       rm -ri $GOPATH 2> /dev/null || true
+       rm -ri $GOPATH  || true
     fi
     logging "remove $SOFTWARE_SRC"
-    rm -ri $SOFTWARE_SRC 2> /dev/null || true
+    rm -ri $SOFTWARE_SRC || true
 }
 
 # 入口函数
