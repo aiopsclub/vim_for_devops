@@ -422,12 +422,10 @@ function clean_me() {
 # 入口函数
 
 function main(){
-    echo $#
     if [ $# -ne 1 ]
     then
         usage
     else
-        echo $1
         case $1 in
         install)
             logging "Install Start..."
