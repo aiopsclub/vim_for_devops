@@ -50,7 +50,7 @@ function ensure_dir_exist(){
 function check_file_md5(){
     filepath=$1
     value=$2
-    md5value=`md5sum $filepath|awk '{print $1}'`
+    md5value=`md5sum ${filepath}|awk '{print $1}'`
 
     if [ $value == $md5value ]
     then
@@ -61,7 +61,7 @@ function check_file_md5(){
 }
 
 function install_base_sortware(){
-    yum install bc git cmake openssl -y
+    yum install bc git cmake openssl libffi-devel -y
     yum groupinstall "Development Tools" -y
 }
 
@@ -167,15 +167,16 @@ function build_go(){
 function install_py3(){
     if [ -e ${SOFTWARE_SRC}Python-3.7.4.tgz ]
     then
-        if ! `check_file_md5 ${SOFTWARE_SRC}Python-3.7.4.tgz PY3_SOURCE_MD5`
+        logging "find python3.7.4 source"
+        if ! `check_file_md5 ${SOFTWARE_SRC}Python-3.7.4.tgz $PY3_SOURCE_MD5`
         then
+            logging "python3.7.4 md5value unmatch.."
             rm -f ${SOFTWARE_SRC}Python-3.7.4.tgz
-            wget $PY3_SOURCE
-        else
-            build_py3
+            wget $PY3_SOURCE -P ${SOFTWARE_SRC}
         fi
+        build_py3
     else
-        wget $PY3_SOURCE
+        wget $PY3_SOURCE -P ${SOFTWARE_SRC}
         build_py3
     fi
 }
@@ -183,47 +184,63 @@ function install_py3(){
 function install_go(){
     if [ -e ${SOFTWARE_SRC}go1.13.linux-amd64.tar.gz ]
     then
-        if ! `check_file_md5 ${SOFTWARE_SRC}go1.13.linux-amd64.tar.gz GO_SOURCE_MD5`
+        if ! `check_file_md5 ${SOFTWARE_SRC}go1.13.linux-amd64.tar.gz $GO_SOURCE_MD5`
         then
             rm -f ${SOFTWARE_SRC}go1.13.linux-amd64.tar.gz
-            wget $GO_BINARY
+            wget $GO_BINARY -P ${SOFTWARE_SRC}
         else
             build_go
         fi
     else
-        wget $GO_BINARY
+        wget $GO_BINARY -P ${SOFTWARE_SRC}
         build_go
     fi
 }
 
-function main(){
-    if `check_dir_exist ${SOFTWARE_PATH_BASE}python3.7`
+function check_soft_is_install(){
+
+    soft_name=$1
+    if `check_dir_exist ${SOFTWARE_PATH_BASE}${soft_name}`
     then
-        if ! `dir_is_empty ${SOFTWARE_PATH_BASE}python3.7`
+        if ! `dir_is_empty ${SOFTWARE_PATH_BASE}${soft_name}`
          
         then
-            logging "${SOFTWARE_PATH_BASE}python3.7 not empty!"
-            exit 1
+            logging "${SOFTWARE_PATH_BASE}${soft_name} not empty!"
+            read -n1 -p "Do you want to skip install ${soft_name} [Y/N]? " answer 
+            case $answer in 
+            Y|y) 
+                echo ""
+                logging "skip install ${soft_name}" 
+                python_mode="false"
+                ;;
+            N|n) 
+                echo ""
+                logging "ok,good bye"
+
+                logging "Please remove ${SOFTWARE_PATH_BASE}${soft_name}"
+                exit 1
+                ;; 
+            *) 
+                echo "error choice" 
+                exit 2
+                ;;
+            esac
         fi
     fi
 
-    if `check_dir_exist ${SOFTWARE_PATH_BASE}vim81`
-    then
-        if ! `dir_is_empty ${SOFTWARE_PATH_BASE}vim81`
-        then
-            logging "${SOFTWARE_PATH_BASE}vim81 not empty!"
-            exit 2
-        fi
-    fi
+}
 
-    if `check_dir_exist ${SOFTWARE_PATH_BASE}go1.13`
-    then
-        if ! `dir_is_empty ${SOFTWARE_PATH_BASE}go1.13`
-        then
-            logging "${SOFTWARE_PATH_BASE}go1.13 not empty!"
-            exit 3
-        fi
-    fi
+function main(){
+    ensure_dir_exist ${SOFTWARE_SRC}
+    install_base_sortware
+    
+    
+    check_soft_is_install python3.7 
+    check_soft_is_install vim81 
+    check_soft_is_install go1.13 
+    echo $python_mode
+
+    # install_py3
 }
 
 # 入口函数
