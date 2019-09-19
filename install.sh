@@ -400,9 +400,9 @@ function usage(){
 
 function remove_software(){
    spath=$1
-   logging "remove $spath"
    if [ -d $spath ]
    then
+       logging "remove $spath"
        rm -fr $spath
    fi
 
