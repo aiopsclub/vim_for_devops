@@ -208,6 +208,8 @@ function build_vim(){
     else
         python3_install_config=${python3_config}
     fi
+    logging "py2config: ${python27_config}"
+    logging "py3config: ${python3_install_config}"
 
     cd ${SOFTWARE_SRC}vim/src
     ./configure --with-features=huge --enable-multibyte --enable-rubyinterp=yes --enable-pythoninterp=yes --with-python-config-dir=${python27_config} --enable-python3interp=yes --with-python3-config-dir=${python3_install_config} --enable-perlinterp=yes --enable-luainterp=yes --enable-cscope --prefix=${SOFTWARE_PATH_BASE}vim8   --enable-terminal --enable-multibyte
