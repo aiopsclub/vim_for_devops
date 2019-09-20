@@ -168,7 +168,7 @@ function build_go(){
     # 创建临时目录
     tmp_dir=`mktemp -d`
     tar xf ${SOFTWARE_SRC}go1.13.linux-amd64.tar.gz -C ${tmp_dir}
-    mv ${tmp_dir}go ${SOFTWARE_SRC}go1.13
+    mv ${tmp_dir}/go ${SOFTWARE_PATH_BASE}go1.13
     rm -fr ${tmp_dir}
 }
 
