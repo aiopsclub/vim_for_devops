@@ -91,6 +91,10 @@ function check_dir_exist(){
 
 function go_depend_source() {
     rm -fr $GOPATH/src/golang.org/x/lint || true
+    rm -fr $GOPATH/src/golang.org/x/tools || true
+    rm -fr $GOPATH/src/golang.org/x/sync || true
+    rm -fr $GOPATH/src/golang.org/x/net || true
+    rm -fr $GOPATH/src/golang.org/x/xerrors || true
     git clone https://github.com/golang/lint.git $GOPATH/src/golang.org/x/lint
     git clone https://github.com/golang/tools.git $GOPATH/src/golang.org/x/tools
     git clone https://github.com/golang/sync.git $GOPATH/src/golang.org/x/sync
@@ -375,8 +379,9 @@ function install_me(){
        check_soft_is_install go1.13 
        install_go
        source /etc/profile
-       go_depend_source
     fi
+    echo ""
+    go_depend_source
     echo ""
 
     logging "install vim vundle plugin manager..."
