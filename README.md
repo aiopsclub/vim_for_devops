@@ -9,6 +9,8 @@ A vim ide install script, it support code highlight, automatic code completion f
 * python >= 3.6
 
 This script will auto install all software. 
+ 
+
 Import: it only run Centos7
 
 
