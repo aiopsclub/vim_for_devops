@@ -408,6 +408,22 @@ function remove_software(){
 
 }
 
+function restroe_vim_conf(){
+    logging "restroe vim conf if exists"
+    rm -fr ~/.vim &> /dev/null || true
+    if [ -d ~/.vim.bak ]
+    then
+        mv ~/.vim.bak ~/.vim
+    fi
+
+    rm -f ~/.vimrc &> /dev/null || true
+    if [ -d ~/.vimrc ]
+    then
+        mv ~/.vimrc.bak ~/.vimrc
+    fi
+
+}
+
 function clean_me() {
     remove_software ${SOFTWARE_PATH_BASE}python3.7
     remove_software  ${SOFTWARE_PATH_BASE}go1.13
@@ -417,6 +433,8 @@ function clean_me() {
        remove_software $GOPATH
     fi
     remove_software $SOFTWARE_SRC
+    
+    restroe_vim_conf
 }
 
 # 入口函数
