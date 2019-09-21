@@ -203,14 +203,12 @@ function build_go(){
 function build_vim(){
     old_dir=`pwd`
     logging "python3_install_mode: ${python3_install_mode}"
-    sleep 10
     if `${python3_install_mode}`
     then
         python3_install_config=${SOFTWARE_PATH_BASE}python3.7/lib/python3.7/config-3.7m-x86_64-linux-gnu
     else
         python3_install_config=${python3_config}
     fi
-    sleep 10
     logging "py2config: ${python27_config}"
     logging "py3config: ${python3_install_config}"
 
