@@ -17,7 +17,6 @@
 #      REVISION:  ---
 #===============================================================================
 
-set -o nounset                                  # Treat unset variables as an error
 set -e
 
 # 配置参数
@@ -62,7 +61,7 @@ function check_file_md5(){
 
 function install_base_software(){
     logging "Start install base software..."
-    yum install bc ncurses-devel wget git cmake openssl perl* libffi-devel python-devel ruby-devel lua-devel perl-devel perl ruby lua -y
+    yum install bc ncurses-devel openssl openssl-devel wget git cmake openssl perl* libffi-devel python-devel ruby-devel lua-devel perl-devel perl ruby lua -y
     yum groupinstall "Development Tools" -y
 }
 
@@ -91,7 +90,7 @@ function check_dir_exist(){
 
 
 function go_depend_source() {
-   
+    rm -fr $GOPATH/src/golang.org/x/lint || true
     git clone https://github.com/golang/lint.git $GOPATH/src/golang.org/x/lint
     git clone https://github.com/golang/tools.git $GOPATH/src/golang.org/x/tools
     git clone https://github.com/golang/sync.git $GOPATH/src/golang.org/x/sync
@@ -134,12 +133,23 @@ function go_install_binaries(){
 }
 
 function install_vim_vundle(){
+    rm -fr ~/.vim.bak &> /dev/null || true
+    if [ -d ~/.vim ]
+    then
+        mv ~/.vim ~/.vim.bak
+    fi
+    rm -fr ~/.vim &> /dev/null || true
     git clone https://github.com/VundleVim/Vundle.vim.git ~/.vim/bundle/Vundle.vim
 }
 
 function install_ycm_plugin(){
     ycm_old_dir=`pwd`
-    git clone ${YCM_GITHUB} ~/.vim/bundle/
+    export GO111MODULE=on
+    export GOPROXY=https://goproxy.io
+    if ! [ -d  ~/.vim/bundle/YouCompleteMe ]
+    then
+        git clone ${YCM_GITHUB} ~/.vim/bundle/YouCompleteMe
+    fi
     cd  ~/.vim/bundle/YouCompleteMe
     git submodule update --init --recursive
     ./install.py --clang-completer  --go-completer
@@ -167,10 +177,14 @@ function build_py3(){
     cp -f ${worddir}/Setup.dist ${SOFTWARE_SRC}Python-3.7.4/Modules/
     cd ${SOFTWARE_SRC}Python-3.7.4
     ./configure --prefix=${SOFTWARE_PATH_BASE}python3.7 --enable-shared  --enable-optimizations --enable-ipv6
-    make && make install
-    echo -n "${SOFTWARE_PATH_BASE}python3.7/lib" >> /etc/ld.so.conf.d/python3.conf
+    make && make install || exit 6
+    echo -n "${SOFTWARE_PATH_BASE}python3.7/lib" > /etc/ld.so.conf.d/python3.conf
     ldconfig -v
-    echo "export PATH=${PATH}:${SOFTWARE_PATH_BASE}python3.7/bin" >> /etc/profile 
+    
+    if ! `cat /etc/profile | grep ${PATH}:${SOFTWARE_PATH_BASE}python3.7/bin`
+    then
+       echo "export PATH=${PATH}:${SOFTWARE_PATH_BASE}python3.7/bin" >> /etc/profile 
+    fi
     cd $old_dir	
 }
 
@@ -180,7 +194,10 @@ function build_go(){
     tar xf ${SOFTWARE_SRC}go1.13.linux-amd64.tar.gz -C ${tmp_dir}
     mv ${tmp_dir}/go ${SOFTWARE_PATH_BASE}go1.13
     rm -fr ${tmp_dir}
-    echo "export PATH=${PATH}:${SOFTWARE_PATH_BASE}go1.13/bin" >> /etc/profile 
+    if ! `cat /etc/profile | grep ${PATH}:${SOFTWARE_PATH_BASE}go1.13/bin`
+    then
+        echo "export PATH=${PATH}:${SOFTWARE_PATH_BASE}go1.13/bin" >> /etc/profile 
+    fi
 }
 
 function build_vim(){
@@ -195,7 +212,16 @@ function build_vim(){
     cd ${SOFTWARE_SRC}vim/src
     ./configure --with-features=huge --enable-multibyte --enable-rubyinterp=yes --enable-pythoninterp=yes --with-python-config-dir=${python27_config} --enable-python3interp=yes --with-python3-config-dir=${python3_install_config} --enable-perlinterp=yes --enable-luainterp=yes --enable-cscope --prefix=${SOFTWARE_PATH_BASE}vim8   --enable-terminal --enable-multibyte
     make && make install || exit 6 
-    echo -n "export PATH=${PATH}:${SOFTWARE_PATH_BASE}vim8/bin" >> /etc/profile 
+    # echo -n "export PATH=${PATH}:${SOFTWARE_PATH_BASE}vim8/bin" >> /etc/profile 
+    if `which vi &> /dev/null`
+    then
+        vi_path=`which vi`
+        mv ${vi_path} ${vi_path}.bak
+    fi
+    rm -fr /usr/bin/vim || true
+    rm -fr /usr/bin/vi || true
+    ln -svf ${SOFTWARE_PATH_BASE}vim8/bin/vim /usr/bin/vim 
+    ln -svf ${SOFTWARE_PATH_BASE}vim8/bin/vim /usr/bin/vi 
     cd $old_dir
 }
 
@@ -313,9 +339,20 @@ function main(){
         source /etc/profile
     else
         python3_install_mode=false
+        echo ""
         read -p "please input custom python3 config dir:" python3_config
+        while true
+        do
+            if [[ "$python3_config" =~ ^/[a-zA-Z0-9]+(/[a-zA-Z0-9]+)*  ]]
+            then
+                break
+            else
+                read -p "dir format error, please input custom python3 config dir:" python3_config
+            fi
+        done
     fi
-    pip3 install flake
+    pip3 install --upgrade pip
+    pip3 install flake8
     pip3 install black
     pip3 install isort
     echo ""
@@ -341,7 +378,7 @@ function main(){
 
     logging "install vim vundle plugin manager..."
     install_vim_vundle
-    logging "Copy vimrc to ${~}..."
+    logging "Copy vimrc..."
     copy_vimrc_to_home
     logging "install ycm plugin..."
     install_ycm_plugin
