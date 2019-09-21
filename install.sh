@@ -311,7 +311,7 @@ function set_gopath(){
     logging "set GOPATH $GOPATH"
 }
 
-function main(){
+function install_me(){
     ensure_dir_exist ${SOFTWARE_SRC}
     install_base_software
     set_gopath
@@ -393,5 +393,48 @@ function main(){
     
 }
 
+function usage(){
+    echo "help: bash $0 install | clean"
+
+}
+
+function clean_me() {
+    logging "remove python3..."
+    rm -r ${SOFTWARE_PATH_BASE}python3.7
+    logging "remove go1.13..."
+    rm -r ${SOFTWARE_PATH_BASE}go1.13
+    logging "remove vim8..."
+    rm -r ${SOFTWARE_PATH_BASE}vim8
+    logging "remove $GOPATH"
+    rm -r $GOPATH
+    logging "remove $SOFTWARE_SRC"
+    rm -r $SOFTWARE_SRC
+}
+
 # 入口函数
-main
+
+function main(){
+    echo $#
+    if [ $# -ne 1 ]
+    then
+        usage
+    else
+        echo $1
+        case $1 in
+        install)
+            logging "Install Start..."
+            install_me
+            ;;
+        clean)
+            logging "Clean Start..."
+            clean_me
+            ;;
+        *)
+            logging "Unkown Choice[install | clean ]" 
+            exit 999
+            ;;
+        esac
+    fi
+}
+
+main $@
