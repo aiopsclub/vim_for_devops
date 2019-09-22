@@ -315,6 +315,12 @@ function set_gopath(){
     else
         export GOPATH=$gopath
     fi
+    if ! `cat /etc/profile | grep GOPATH`
+    then
+        echo "export GOPATH=$GOPATH >> /etc/profile"
+    fi
+
+
     logging "set GOPATH $GOPATH"
 }
 
