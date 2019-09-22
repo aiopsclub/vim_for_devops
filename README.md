@@ -25,6 +25,8 @@ bash ./install.sh install
 ```
 
 # ScreenShot
+python 代码检查以及自动补全和代码高亮 
+
 ![python 代码检查以及自动补全和代码高亮](https://github.com/yxxhero/vim_for_devops/blob/master/screenshoot/python_auto.gif)
 
 
