@@ -24,6 +24,9 @@ cd vim_for_devops
 bash ./install.sh install
 ```
 
+# ScreenShot
+
+
 # Uninstallation
 
 [(Back to top)](#vim-for-devops)
