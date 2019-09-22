@@ -33,9 +33,6 @@ python isort自动格式化import相关的库
 
 ![python isort自动格式化import相关的库](https://github.com/yxxhero/vim_for_devops/blob/master/screenshoot/isort.gif)
 
-python isort自动格式化import相关的库
-
-![python isort自动格式化import相关的库](https://github.com/yxxhero/vim_for_devops/blob/master/screenshoot/isort.gif)
 
 python目录树以及自动pep8格式化代码
 
