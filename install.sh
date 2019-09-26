@@ -61,7 +61,12 @@ function check_file_md5(){
 
 function install_base_software(){
     logging "Start install base software..."
-    yum install bc ncurses-devel openssl openssl-devel wget git cmake openssl perl* libffi-devel python-devel ruby-devel lua-devel perl-devel perl ruby lua -y
+    if ! `which git &> /dev/null`
+    then
+        logging "Git not found. Install git."
+        yum install git -y
+    fi
+    yum install bc sqlite* ncurses-devel openssl openssl-devel wget cmake openssl perl* libffi-devel python-devel ruby-devel lua-devel perl-devel perl ruby lua -y
     yum groupinstall "Development Tools" -y
 }
 
@@ -148,8 +153,6 @@ function install_vim_vundle(){
 
 function install_ycm_plugin(){
     ycm_old_dir=`pwd`
-    export GO111MODULE=on
-    export GOPROXY=https://goproxy.io
     if ! [ -d  ~/.vim/bundle/YouCompleteMe ]
     then
         git clone ${YCM_GITHUB} ~/.vim/bundle/YouCompleteMe
@@ -352,18 +355,8 @@ function install_me(){
         source /etc/profile
     else
         python3_install_mode=false
-        echo ""
-        read -p "please input custom python3 config dir:" python3_config
-        while true
-        do
-            if [[ "$python3_config" =~ ^/[a-zA-Z0-9]+(/[a-zA-Z0-9]+)*  ]]
-            then
-                break
-            else
-                read -p "dir format error, please input custom python3 config dir:" python3_config
-            fi
-        done
     fi
+    echo ""
     pip3 install --upgrade pip
     pip3 install flake8
     pip3 install black
@@ -373,11 +366,29 @@ function install_me(){
     logging "Install vim..."
     if `install_choice vim8` 
     then
+        if ! `$python3_install_mode`
+        then
+            echo ""
+            read -p "please input custom python3 config dir:" python3_config
+            while true
+            do
+                if [[ "$python3_config" =~ ^/[a-zA-Z0-9]+(/[a-zA-Z0-9]+)*  ]]
+                then
+                    break
+                else
+                    read -p "dir format error, please input custom python3 config dir:" python3_config
+                fi
+            done
+        fi
         check_soft_is_install vim8
         install_vim
         source /etc/profile
     fi
     echo ""
+
+    logging "set go mod mode..."
+    export GO111MODULE=on
+    export GOPROXY=https://goproxy.io
 
     logging "Install golang..."
     if `install_choice go1.13` 
