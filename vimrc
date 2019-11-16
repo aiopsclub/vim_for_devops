@@ -1,6 +1,7 @@
 set nocompatible              " be iMproved, required
 filetype off                   " required!
 autocmd BufWritePre *.py execute ':Black'
+autocmd BufWritePre *.py execute ':Isort'
 set rtp+=~/.vim/bundle/Vundle.vim
 call vundle#begin()
 
@@ -9,9 +10,12 @@ call vundle#begin()
 Plugin 'altercation/vim-colors-solarized'
 Plugin 'WolfgangMehner/bash-support'
 Plugin 'terryma/vim-multiple-cursors'
+Plugin 'spacewander/openresty-vim'
 Plugin 'gmarik/Vundle.vim'
 Plugin 'Valloric/YouCompleteMe'
 Plugin 'fisadev/vim-isort'
+Plugin 'leafgarland/typescript-vim'
+Plugin 'Quramy/tsuquyomi'
 let g:vim_isort_python_version = 'python3'
 Plugin 'kien/ctrlp.vim'
 Plugin 'python-mode/python-mode', { 'branch': 'develop'  }
@@ -19,8 +23,8 @@ let g:pymode = 1
 let g:pymode_python = 'python3'
 let g:pymode_options_max_line_length = 150 
 Plugin 'skywind3000/asyncrun.vim'
-Plugin 'ambv/black'
 Plugin 'jiangmiao/auto-pairs'
+Plugin 'psf/black'
 Plugin 'itchyny/lightline.vim'
 Plugin 'tell-k/vim-autopep8'
 Plugin 'ruanyl/vim-fixmyjs'
@@ -78,7 +82,7 @@ let g:NERDTreeWinSize=28
 "Bundle 'wting/rust.vim'
 "golang
 Plugin 'fatih/vim-go'
-let g:go_fmt_command = "goimports"
+" let g:go_fmt_command = "goimports"
 let g:go_highlight_types = 1
 let g:go_highlight_functions = 1
 let g:go_highlight_function_calls = 1
@@ -279,12 +283,16 @@ inoremap <C-Z> <C-O>u
 " CTRL-Y is Redo (although not repeat); not in cmdline though
 noremap <C-Y> <C-R>
 inoremap <C-Y> <C-O><C-R>
-" 安装ycm时可自行git clone, 并执行git submodule update --init --recursive
-
+" 安装ycm时可自行git clone
 let g:ycm_global_ycm_extra_conf='~/.vim/bundle/YouCompleteMe/.ycm_extra_conf.py'  "设置全局配置文件的路径
 let g:ycm_seed_identifiers_with_syntax=1    " 语法关键字补全
 let g:ycm_confirm_extra_conf=0  " 打开vim时不再询问是否加载ycm_extra_conf.py配置
 let g:ycm_key_invoke_completion = '<C-a>' " ctrl + a 触发补全
+let g:ycm_server_python_interpreter='python3'
+if !exists("g:ycm_semantic_triggers")
+  let g:ycm_semantic_triggers = {}
+endif
+let g:ycm_semantic_triggers['typescript'] = ['.']
 
 " CTRL-A is Select all 
 " noremap <C-A> gggH<C-O>G
@@ -349,3 +357,4 @@ map <F9> :Fixmyjs<CR>
 "用 vimdiff 显示文件差异
 
 "autocmd BufWritePost *.py call Flake8()
+au BufRead,BufNewFile *.tpl set filetype=gohtmltmpl
