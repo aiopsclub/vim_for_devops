@@ -66,7 +66,7 @@ function install_base_software(){
         logging "Git not found. Install git."
         yum install git -y
     fi
-    yum install bc sqlite* ncurses-devel openssl openssl-devel wget cmake openssl perl* libffi-devel python-devel ruby-devel lua-devel perl-devel perl ruby lua -y
+    yum install bc sqlite  sqlite-devel ncurses-devel openssl openssl-devel wget cmake openssl perl* libffi-devel python-devel ruby-devel lua-devel perl-devel perl ruby lua -y
     yum groupinstall "Development Tools" -y
 }
 
