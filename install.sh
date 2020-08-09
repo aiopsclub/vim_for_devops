@@ -28,7 +28,7 @@ SOFTWARE_SRC=/opt/src/
 
 YCM_GITHUB=https://github.com/ycm-core/YouCompleteMe
 
-PY3_SOURCE=https://www.python.org/ftp/python/3.7.4/Python-3.7.4.tgz
+PY3_SOURCE=https://mirrors.huaweicloud.com/python/3.7.4/Python-3.7.4.tgz
 PY3_SOURCE_MD5=68111671e5b2db4aef7b9ab01bf0f9be
 
 GO_BINARY=https://dl.google.com/go/go1.13.linux-amd64.tar.gz
